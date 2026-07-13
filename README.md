@@ -59,12 +59,14 @@ VitalSync is a commercial-grade Electronic Health Record (EHR) and clinical mana
 
 ## 📐 System Architecture Diagram
 
-![Entity Relationship Diagram](vitalsync_architecture_v2.png)
+![System Architecture](vitalsync_architecture_v2.png)
+
+![Entity-Relationship Diagram](erd.png)
 
 *Note: Built with PostgreSQL strict foreign key constraints using TypeORM to ensure clinical data compliance.*
 
-![Untitled (1).png](Untitled_(1).png)
-
 ## 🎨 UI/UX Wireframes
 
-[**🔗 Click Here to View the Public Figma Wireframes**](https://www.figma.com/board/dq2FnmCBGmtSzdFMW803Cl/VitalSync?node-id=0-1&t=f9K2Wi18FPNDFkiD-1)
+[**🔗 Click Here or below to View the Public Figma Wireframes**](https://www.figma.com/board/dq2FnmCBGmtSzdFMW803Cl/VitalSync?node-id=0-1&t=f9K2Wi18FPNDFkiD-1)
+
+https://www.figma.com/board/dq2FnmCBGmtSzdFMW803Cl/VitalSync?node-id=0-1&t=f9K2Wi18FPNDFkiD-1
