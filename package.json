@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "next dev --hostname 0.0.0.0 --port 5173",
-    "dev:backend": "set \"PORT=3001\"&& npx tsx backend/server.ts",
+    "dev:backend": "set \"PORT=3001\"&& npx tsx --tsconfig backend/tsconfig.json backend/server.ts",
     "dev:local": "next dev --port 5173",
     "build": "next build",
     "start": "next start",
