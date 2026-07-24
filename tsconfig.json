@@ -4,11 +4,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": false,
-    "module": "NodeNext",
+    "module": "ESNext",
     "lib": [ "ES2022", "DOM", "DOM.Iterable" ],
     "skipLibCheck": true,
-    "moduleResolution": "NodeNext",
-    "isolatedModules": false,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "preserve",
@@ -32,8 +32,7 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "backend/**/*.ts"
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
