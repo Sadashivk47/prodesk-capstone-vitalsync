@@ -35,19 +35,25 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email) {
+    if (!name || !email || !password) {
       setErrorMessage('Please fill in all required fields');
+      return;
+    }
+    if (password.length < 8) {
+      setErrorMessage('Password must be at least 8 characters');
       return;
     }
     setIsLoading(true);
 
     try {
-      const { token, user } = await authApi.register({ email, name, role, specialty });
+      const { token, user } = await authApi.register({ email, password, name, role, specialty });
       auth.setToken(token);
       auth.setUser(user);
       onLoginSuccess(user);
     } catch (err: any) {
-      setErrorMessage(err.message || 'Registration failed');
+      const backendMsg = err.response?.data?.message;
+      const displayMsg = Array.isArray(backendMsg) ? backendMsg.join(', ') : backendMsg || err.message || 'Registration failed';
+      setErrorMessage(displayMsg);
     } finally {
       setIsLoading(false);
     }
@@ -167,6 +173,19 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.name@hospital.com"
                   required
+                  className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">PASSWORD (MIN 8 CHARS)</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={8}
                   className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
                 />
               </div>

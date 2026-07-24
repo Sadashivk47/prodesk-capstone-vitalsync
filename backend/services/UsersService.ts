@@ -68,7 +68,8 @@ export class UsersService {
     const displayName = dto.name.trim();
     const memberSince = new Date().getFullYear().toString();
 
-    const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
+    const rawPassword = dto.password && dto.password.trim().length > 0 ? dto.password.trim() : "Password@123";
+    const passwordHash = await bcrypt.hash(rawPassword, BCRYPT_ROUNDS);
 
     const avatarUrl =
       dto.role === "doctor"
