@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Appointment, AvailabilitySlot, ClinicalFeedItem, MedicalRecord, Prescription, Biometrics } from './types';
+import { User, Role, Appointment, AvailabilitySlot, ClinicalFeedItem, MedicalRecord, Prescription, Biometrics } from './types';
 import { auth } from './lib/auth';
 import {
   authApi,
@@ -118,6 +118,15 @@ export default function App() {
     setCurrentUser(null);
   };
 
+  const handleSwitchRole = (role: Role) => {
+    if (!currentUser) return;
+    setCurrentUser({
+      ...currentUser,
+      role,
+    });
+    setActiveTab('dashboard');
+  };
+
   const handleAddMedicalRecord = async (newRecordData: MedicalRecord) => {
     try {
       const created = await medicalRecordsApi.createRecord(newRecordData);
@@ -194,7 +203,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
-        onSwitchRole={() => {}}
+        onSwitchRole={handleSwitchRole}
       />
 
       {/* Main Content Area */}
