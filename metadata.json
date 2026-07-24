@@ -1,0 +1,6 @@
+{
+  "name": "VitalSync",
+  "description": "Clinical Intelligence Platform and Patient Portal for doctors and patients with medical history tracking, scheduling, and clinical insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
