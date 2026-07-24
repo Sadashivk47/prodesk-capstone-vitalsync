@@ -42,7 +42,7 @@ async function startServer() {
     const expressInstance = app.getHttpAdapter().getInstance() as express.Application;
     const distPath = path.join(process.cwd(), "dist");
     expressInstance.use(express.static(distPath));
-    expressInstance.get("*", (_req, res) => {
+    expressInstance.get("*path", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
