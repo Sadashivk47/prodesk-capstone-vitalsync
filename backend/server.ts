@@ -1,8 +1,6 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
-import express from "express";
-import path from "path";
 import dotenv from "dotenv";
 
 import { initializeDatabase } from "./config/data-source.js";
@@ -16,18 +14,38 @@ async function startServer() {
   // Initialize TypeORM Database Connection & Seeding
   await initializeDatabase();
 
-  const frontendUrl = process.env.FRONTEND_URL;
-  // In dev, Vite runs on :5173 — allow that origin too
-  const corsOrigins = frontendUrl
-    ? [frontendUrl, "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
-    : ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"];
+  const frontendUrl = process.env.FRONTEND_URL?.trim().replace(/\/$/, "");
 
-  // Bootstrap NestJS Application — API only
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      origin: corsOrigins,
-      credentials: true,
+  // Explicit allowlist — dev origins + production Vercel URL
+  const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    ...(frontendUrl ? [frontendUrl] : []),
+  ]);
+
+  // Bootstrap NestJS without inline cors — we call enableCors() below
+  // so it is registered as the very first Express middleware.
+  const app = await NestFactory.create(AppModule, { logger: ["log", "warn", "error"] });
+
+  // Full CORS config — must be called before useGlobalPipes and listen()
+  app.enableCors({
+    origin: (incomingOrigin, callback) => {
+      // Allow server-to-server requests (no Origin header) and health checks
+      if (!incomingOrigin) return callback(null, true);
+      // Exact allowlist match
+      if (allowedOrigins.has(incomingOrigin)) return callback(null, true);
+      // Safety net: allow any *.vercel.app subdomain (preview deployments)
+      if (incomingOrigin.endsWith(".vercel.app")) return callback(null, true);
+      // Reject everything else
+      console.warn(`[CORS] Blocked origin: ${incomingOrigin}`);
+      callback(new Error(`CORS: origin ${incomingOrigin} is not allowed`));
     },
+    methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   app.useGlobalPipes(
@@ -37,22 +55,9 @@ async function startServer() {
     }),
   );
 
-  // Production: serve the built frontend from dist/
-  if (process.env.NODE_ENV === "production") {
-    const expressInstance = app.getHttpAdapter().getInstance() as express.Application;
-    const distPath = path.join(process.cwd(), "dist");
-    expressInstance.use(express.static(distPath));
-    expressInstance.get("*path", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-  }
-
   await app.listen(PORT, "0.0.0.0");
   console.log(`✅ VitalSync API Server running on http://0.0.0.0:${PORT}`);
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`   Frontend dev server: http://localhost:5173`);
-  }
+  console.log(`   Allowed origins: ${[...allowedOrigins].join(", ")} + *.vercel.app`);
 }
 
 startServer();
-
