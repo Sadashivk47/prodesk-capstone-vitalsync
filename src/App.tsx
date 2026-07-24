@@ -194,6 +194,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
+        onSwitchRole={() => {}}
       />
 
       {/* Main Content Area */}
