@@ -11,6 +11,7 @@ import {
   Pill,
   LogOut,
   Activity,
+  CreditCard,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -36,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'availability', label: 'Availability', icon: Clock },
     { id: 'patients', label: 'Patients', icon: Users },
     { id: 'prescriptions', label: 'Prescriptions', icon: Pill },
+    { id: 'billing', label: 'Billing & Dues', icon: CreditCard },
   ];
 
   const patientNavItems = [
@@ -44,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'book', label: 'Book appointment', icon: PlusCircle },
     { id: 'history', label: 'Medical history', icon: History },
     { id: 'prescriptions', label: 'Prescriptions', icon: Pill },
+    { id: 'billing', label: 'Billing & Payments', icon: CreditCard },
   ];
 
   const navItems = isDoctor ? doctorNavItems : patientNavItems;

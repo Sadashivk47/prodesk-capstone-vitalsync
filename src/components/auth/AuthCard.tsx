@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Role } from '../../types';
 import { auth } from '../../lib/auth';
 import { authApi } from '../../lib/api';
-import { Activity, ShieldCheck, UserCheck, Stethoscope } from 'lucide-react';
+import { Activity, ShieldCheck, UserCheck, Stethoscope, Eye, EyeOff } from 'lucide-react';
 
 interface AuthCardProps {
   onLoginSuccess: (user: User) => void;
@@ -17,6 +17,8 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
   const [specialty, setSpecialty] = useState('Cardiology');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,66 +77,79 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
 
           {!isRegisterMode ? (
             /* Sign In Form */
-            <form onSubmit={handleSignIn} className="w-full space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider" htmlFor="email">
-                  EMAIL ADDRESS
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="dr.smith@hospital.com"
-                  required
-                  className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-center">
-                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider" htmlFor="password">
-                    PASSWORD
+            <>
+              <form onSubmit={handleSignIn} className="w-full space-y-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider" htmlFor="email">
+                    EMAIL ADDRESS
                   </label>
-                  <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-teal-800 hover:underline">
-                    FORGOT?
-                  </a>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="dr.smith@hospital.com"
+                    required
+                    className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
+                  />
                 </div>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
-                />
-              </div>
 
-              {errorMessage && (
-                <div className="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
-                  {errorMessage}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider" htmlFor="password">
+                      PASSWORD
+                    </label>
+                    <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-teal-800 hover:underline">
+                      FORGOT?
+                    </a>
+                  </div>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      className="w-full h-12 px-4 pr-11 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-800 transition-colors cursor-pointer"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
-              )}
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-12 bg-teal-800 text-white font-semibold text-base rounded-lg hover:bg-teal-900 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-sm shadow-teal-900/10"
-              >
-                {isLoading ? 'Signing in...' : 'Sign in'}
-              </button>
+                {errorMessage && (
+                  <div className="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+                    {errorMessage}
+                  </div>
+                )}
 
-              <div className="pt-3 border-t border-slate-100">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 text-center mb-1">
-                  Demo credentials are not stored in the client.
-                </p>
-                <p className="text-[11px] text-slate-500 text-center">
-                  Use the seeded user logins from the deployment notes.
-                </p>
-              </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-12 bg-teal-800 text-white font-semibold text-base rounded-lg hover:bg-teal-900 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-sm shadow-teal-900/10"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign in'}
+                </button>
 
-              <div className="pt-4 text-center">
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 text-center mb-1">
+                    Demo credentials are not stored in the client.
+                  </p>
+                  <p className="text-[11px] text-slate-500 text-center">
+                    Use the seeded user logins from the deployment notes.
+                  </p>
+                </div>
+              </form>
+
+              {/* Register link sits OUTSIDE the form so it never triggers sign-in submit */}
+              <div className="pt-4 text-center w-full">
                 <p className="text-sm text-slate-600">
                   Don't have an account?{' '}
                   <button
@@ -149,7 +164,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                   </button>
                 </p>
               </div>
-            </form>
+            </>
           ) : (
             /* Registration Form */
             <form onSubmit={handleRegister} className="w-full space-y-4">
@@ -179,15 +194,25 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">PASSWORD (MIN 8 CHARS)</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={8}
-                  className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
-                />
+                <div className="relative">
+                  <input
+                    type={showRegPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={8}
+                    className="w-full h-12 px-4 pr-11 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-800 transition-colors cursor-pointer"
+                    aria-label={showRegPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-1.5">

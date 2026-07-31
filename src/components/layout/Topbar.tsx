@@ -21,7 +21,12 @@ export const Topbar: React.FC<TopbarProps> = ({
 }) => {
   const isDoctor = user.role === 'doctor';
   const title = titleOverride || (isDoctor ? 'VitalSync Dashboard' : 'VitalSync Portal');
-  const dateStr = 'TUESDAY, OCTOBER 24, 2024';
+  const dateStr = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).toUpperCase();
 
   return (
     <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 h-16 px-4 md:px-8 flex items-center justify-between">

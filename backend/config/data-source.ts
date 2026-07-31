@@ -12,6 +12,7 @@ import { MedicalRecord } from "../entities/MedicalRecord.js";
 import { Prescription } from "../entities/Prescription.js";
 import { ClinicalFeed } from "../entities/ClinicalFeed.js";
 import { Biometric } from "../entities/Biometric.js";
+import { Payment } from "../entities/Payment.js";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ export const AppDataSource = new DataSource({
     Prescription,
     ClinicalFeed,
     Biometric,
+    Payment,
   ],
   subscribers: [],
   migrations: [],
@@ -369,6 +371,17 @@ function populateInMemorySeeds() {
     { id: 3, patientId: 8,  bloodPressure: "115/75", bloodPressureStatus: "Optimal",  weightLbs: 160, weightChangeLbs:  1, avgDailySteps: 5100, stepGoal:  7500 },
     { id: 8, patientId: 13, bloodPressure: "130/85", bloodPressureStatus: "Elevated", weightLbs: 180, weightChangeLbs: -1, avgDailySteps: 3800, stepGoal:  6000 },
   ]);
+
+  // ── Payments & Doctor Dues ──────────────────────────────────
+  getInMemoryStore(Payment).save([
+    { id: 1, userId: 1, type: "due",          amount: 250.00, description: "Monthly Clinic Facility & Maintenance Fee", dueDate: new Date("2026-08-15"), status: "pending" },
+    { id: 2, userId: 1, type: "due",          amount: 120.00, description: "Medical License & Malpractice Protection Renewal", dueDate: new Date("2026-08-30"), status: "pending" },
+    { id: 3, userId: 1, type: "due",          amount: 75.00,  description: "Annual Telehealth Platform Infrastructure Fee", dueDate: new Date("2026-07-01"), status: "paid" },
+    { id: 4, userId: 2, type: "due",          amount: 200.00, description: "General Clinic Administration & EHR Sync Fee", dueDate: new Date("2026-08-10"), status: "pending" },
+    { id: 5, userId: 6, type: "consultation", amount: 80.00,  description: "Cardiology Virtual Consultation Fee", status: "paid" },
+    { id: 6, userId: 13, type: "prescription", amount: 45.00, description: "Amoxicillin & Loratadine Prescription Order", status: "pending", referenceId: 1 },
+    { id: 7, userId: 13, type: "general",      amount: 50.00,  description: "Lab Processing & Diagnostic Co-pay", status: "pending" },
+  ]);
 }
 
 populateInMemorySeeds();
@@ -403,7 +416,12 @@ export function getSafeRepository<T = any>(entityClass: any): any {
 }
 
 export async function initializeDatabase() {
-  if (!rawDbUrl || rawDbUrl.includes("localhost")) {
+  let dbUrl = process.env.DATABASE_URL;
+  if (dbUrl) {
+    dbUrl = dbUrl.replace(/&?channel_binding=[^&]*/g, '');
+  }
+
+  if (!dbUrl || dbUrl.includes("localhost")) {
     console.log("[TypeORM] No external DATABASE_URL. Using In-Memory Repository Layer.");
     return;
   }
@@ -539,6 +557,18 @@ async function seedDatabaseIfEmpty() {
         bioRepo.create({ patientId: pat7.id,  bloodPressure: "122/80", bloodPressureStatus: "Normal",   weightLbs: 135, weightChangeLbs:  0, avgDailySteps: 6200, stepGoal:  8000 }),
         bioRepo.create({ patientId: pat8.id,  bloodPressure: "115/75", bloodPressureStatus: "Optimal",  weightLbs: 160, weightChangeLbs:  1, avgDailySteps: 5100, stepGoal:  7500 }),
         bioRepo.create({ patientId: pat13.id, bloodPressure: "130/85", bloodPressureStatus: "Elevated", weightLbs: 180, weightChangeLbs: -1, avgDailySteps: 3800, stepGoal:  6000 }),
+      ]);
+
+      // ── Payments & Doctor Dues
+      const payRepo = AppDataSource.getRepository(Payment);
+      await payRepo.save([
+        payRepo.create({ userId: doc1.id, type: "due",          amount: 250.00, description: "Monthly Clinic Facility & Maintenance Fee", dueDate: new Date("2026-08-15"), status: "pending" }),
+        payRepo.create({ userId: doc1.id, type: "due",          amount: 120.00, description: "Medical License & Malpractice Protection Renewal", dueDate: new Date("2026-08-30"), status: "pending" }),
+        payRepo.create({ userId: doc1.id, type: "due",          amount: 75.00,  description: "Annual Telehealth Platform Infrastructure Fee", dueDate: new Date("2026-07-01"), status: "paid" }),
+        payRepo.create({ userId: doc2.id, type: "due",          amount: 200.00, description: "General Clinic Administration & EHR Sync Fee", dueDate: new Date("2026-08-10"), status: "pending" }),
+        payRepo.create({ userId: pat6.id, type: "consultation", amount: 80.00,  description: "Cardiology Virtual Consultation Fee", status: "paid" }),
+        payRepo.create({ userId: pat13.id, type: "prescription", amount: 45.00, description: "Amoxicillin & Loratadine Prescription Order", status: "pending", referenceId: 1 }),
+        payRepo.create({ userId: pat13.id, type: "general",      amount: 50.00,  description: "Lab Processing & Diagnostic Co-pay", status: "pending" }),
       ]);
 
       console.log("[TypeORM] PostgreSQL Seeding complete.");

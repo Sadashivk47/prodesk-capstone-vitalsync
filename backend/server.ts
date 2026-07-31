@@ -1,12 +1,12 @@
 import "reflect-metadata";
+import dotenv from "dotenv";
+dotenv.config();
+
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
-import dotenv from "dotenv";
 
 import { initializeDatabase } from "./config/data-source.js";
 import { AppModule } from "./nest/app.module.js";
-
-dotenv.config();
 
 const PORT = Number(process.env.PORT) || 3001;
 

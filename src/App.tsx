@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Role, Appointment, AvailabilitySlot, ClinicalFeedItem, MedicalRecord, Prescription, Biometrics } from './types';
+import { User, Role, Appointment, AvailabilitySlot, ClinicalFeedItem, MedicalRecord, Prescription, Biometrics, PaymentItem } from './types';
 import { auth } from './lib/auth';
 import {
   authApi,
@@ -12,6 +12,7 @@ import {
   prescriptionsApi,
   patientsApi,
   biometricsApi,
+  paymentsApi,
 } from './lib/api';
 
 import { AuthCard } from './components/auth/AuthCard';
@@ -20,21 +21,53 @@ import { Topbar } from './components/layout/Topbar';
 import { PatientMobileBottomNav } from './components/layout/PatientMobileBottomNav';
 import { DoctorDashboard } from './components/doctor/DoctorDashboard';
 import { PatientDashboard } from './components/patient/PatientDashboard';
+import { NewPatientForm } from './components/patient/NewPatientForm';
 import { MedicalHistoryDetail } from './components/history/MedicalHistoryDetail';
+import { DoctorBilling } from './components/doctor/DoctorBilling';
+import { PatientBilling } from './components/patient/PatientBilling';
 
 import { AddRecordModal } from './components/modals/AddRecordModal';
 import { BookAppointmentModal } from './components/modals/BookAppointmentModal';
 import { AddSlotModal } from './components/modals/AddSlotModal';
 import { AiAssistModal } from './components/modals/AiAssistModal';
+import { PaymentSuccessModal } from './components/modals/PaymentSuccessModal';
 
-import { Calendar, Pill, ArrowRight, Loader2 } from 'lucide-react';
+import { Calendar, Pill, ArrowRight, Loader2, CreditCard, Activity } from 'lucide-react';
+
+// ── 3-state auth model ──────────────────────────────────────────────────────
+// 'loading'        → auth not yet resolved (show spinner, NEVER login screen)
+// 'authenticated'  → user is logged in (show dashboard)
+// 'unauthenticated'→ explicitly logged out (show login screen)
+type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
+
+function AppLoadingSpinner() {
+  return (
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 via-slate-50 to-teal-50/50 gap-4">
+      <div className="w-14 h-14 bg-teal-800 rounded-2xl flex items-center justify-center shadow-md shadow-teal-900/10 animate-pulse">
+        <Activity className="w-8 h-8 text-teal-300" />
+      </div>
+      <div className="flex items-center gap-2 text-slate-500">
+        <Loader2 className="w-4 h-4 animate-spin text-teal-700" />
+        <span className="text-sm font-medium tracking-tight">Loading VitalSync…</span>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedPatientId, setSelectedPatientId] = useState<string>('pat-emily-chen');
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+
+  // Payments & Stripe state
+  const [payments, setPayments] = useState<PaymentItem[]>([]);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [confirmedPaymentId, setConfirmedPaymentId] = useState<number | string | undefined>();
+  const [isSimulatedPayment, setIsSimulatedPayment] = useState(false);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   // Real Database Collections loaded via API
   const [doctorAppointments, setDoctorAppointments] = useState<Appointment[]>([]);
@@ -59,10 +92,12 @@ export default function App() {
   const [isAddSlotOpen, setIsAddSlotOpen] = useState(false);
   const [isAiAssistOpen, setIsAiAssistOpen] = useState(false);
 
-  // Hydrate session & database collections on mount
+  // Hydrate session on mount — resolves authStatus synchronously so the
+  // login screen NEVER renders for already-authenticated users.
   useEffect(() => {
     const user = auth.getUser();
     setCurrentUser(user);
+    setAuthStatus(user ? 'authenticated' : 'unauthenticated');
   }, []);
 
   useEffect(() => {
@@ -73,32 +108,47 @@ export default function App() {
       try {
         await authApi.getMe();
 
-        const [
-          apptsData,
-          slotsData,
-          feedData,
-          recordsData,
-          rxData,
-          patientsData,
-          bioData,
-        ] = await Promise.all([
-          appointmentsApi.getAppointments(),
-          availabilityApi.getSlots(),
-          clinicalFeedApi.getFeed(),
-          medicalRecordsApi.getRecords(),
-          prescriptionsApi.getPrescriptions(),
-          patientsApi.getPatients(),
-          biometricsApi.getBiometrics(),
-        ]);
+        const isDoc = currentUser.role === 'doctor';
 
-        setDoctorAppointments(apptsData);
-        setPatientAppointments(apptsData);
-        setAvailabilitySlots(slotsData);
-        setClinicalFeed(feedData);
-        setMedicalRecords(recordsData);
-        setPrescriptions(rxData);
-        setPatients(patientsData);
-        setBiometrics(bioData);
+        if (isDoc) {
+          // ── Doctor-only data ──────────────────────────────────────
+          const [apptsData, slotsData, feedData, recordsData, rxData, patientsData, paymentsData] =
+            await Promise.all([
+              appointmentsApi.getAppointments(),
+              availabilityApi.getSlots(),
+              clinicalFeedApi.getFeed(),
+              medicalRecordsApi.getRecords(),
+              prescriptionsApi.getPrescriptions(),
+              patientsApi.getPatients(),
+              paymentsApi.getPayments().catch(() => []),
+            ]);
+
+          setDoctorAppointments(apptsData);
+          setPatientAppointments(apptsData);
+          setAvailabilitySlots(slotsData);
+          setClinicalFeed(feedData);
+          setMedicalRecords(recordsData);
+          setPrescriptions(rxData);
+          setPatients(patientsData);
+          setPayments(paymentsData || []);
+        } else {
+          // ── Patient-only data ─────────────────────────────────────
+          const [apptsData, recordsData, rxData, bioData, paymentsData] =
+            await Promise.all([
+              appointmentsApi.getAppointments(),
+              medicalRecordsApi.getRecords(),
+              prescriptionsApi.getPrescriptions(),
+              biometricsApi.getBiometrics(),
+              paymentsApi.getPayments().catch(() => []),
+            ]);
+
+          setPatientAppointments(apptsData);
+          setDoctorAppointments(apptsData);
+          setMedicalRecords(recordsData);
+          setPrescriptions(rxData);
+          setBiometrics(bioData);
+          setPayments(paymentsData || []);
+        }
       } catch (err) {
         console.error('Failed loading backend data:', err);
         if (err instanceof Error && err.message.includes('401')) {
@@ -111,11 +161,85 @@ export default function App() {
     };
 
     loadAllData();
+
+    // Check URL parameters for Stripe checkout redirect callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const sessionId = urlParams.get('session_id');
+    const paymentId = urlParams.get('payment_id');
+    const simulated = urlParams.get('simulated');
+
+    if (paymentStatus === 'success' && sessionId && paymentId) {
+      paymentsApi.confirmPayment(paymentId, sessionId)
+        .then(() => {
+          setConfirmedPaymentId(paymentId);
+          setIsSimulatedPayment(simulated === 'true');
+          setPaymentSuccessModalOpen(true);
+          // Refresh payments list
+          paymentsApi.getPayments().then(setPayments).catch(() => {});
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch((err) => {
+          console.error('Error confirming payment:', err);
+        });
+    } else if (paymentStatus === 'cancelled') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }, [currentUser]);
+
+  const handlePayNow = async (payment: PaymentItem) => {
+    setIsPaymentLoading(true);
+    try {
+      const res = await paymentsApi.createCheckoutSession({
+        type: payment.type,
+        amount: Number(payment.amount),
+        description: payment.description,
+        referenceId: Number(payment.id),
+        dueDate: payment.dueDate,
+      });
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert(`Payment initialization failed: ${err?.response?.data?.message || err?.message || 'Server error'}`);
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  const handleCustomPay = async (
+    amount: number,
+    description: string,
+    type: 'consultation' | 'prescription' | 'general'
+  ) => {
+    setIsPaymentLoading(true);
+    try {
+      const res = await paymentsApi.createCheckoutSession({
+        type,
+        amount,
+        description,
+      });
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert(`Payment initialization failed: ${err?.response?.data?.message || err?.message || 'Server error'}`);
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  const handlePayAndBookAppointment = async (newAppt: Appointment) => {
+    await handleBookAppointment(newAppt);
+    handleCustomPay(80, `Consultation Fee — ${newAppt.doctorName} (${newAppt.date})`, 'consultation');
+  };
 
   const handleLogout = () => {
     auth.clearToken();
     setCurrentUser(null);
+    setAuthStatus('unauthenticated'); // explicit state prevents re-flash on logout
   };
 
   const handleSwitchRole = (role: Role) => {
@@ -181,9 +305,23 @@ export default function App() {
     setActiveTab('history');
   };
 
-  if (!currentUser) {
-    return <AuthCard onLoginSuccess={(user) => setCurrentUser(user)} />;
+  // ── Auth gate (3-state) ───────────────────────────────────────────────────
+  if (authStatus === 'loading') {
+    // Auth not yet resolved — show neutral spinner, never the login screen
+    return <AppLoadingSpinner />;
   }
+  if (authStatus === 'unauthenticated' || !currentUser) {
+    // Explicitly logged out — safe to show login
+    return (
+      <AuthCard
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          setAuthStatus('authenticated');
+        }}
+      />
+    );
+  }
+  // authStatus === 'authenticated' → fall through to dashboard
 
   const isDoctor = currentUser.role === 'doctor';
   const selectedPatient = patients.find((p) => p.id === selectedPatientId) || patients[0] || {
@@ -228,16 +366,14 @@ export default function App() {
           {activeTab === 'dashboard' && (
             isDoctor ? (
               <DoctorDashboard
+                user={currentUser}
                 appointments={doctorAppointments}
                 availabilitySlots={availabilitySlots}
                 clinicalFeed={clinicalFeed}
                 onViewPatientRecord={handleViewPatientRecord}
                 onOpenAddSlot={() => setIsAddSlotOpen(true)}
                 onDeleteSlot={handleDeleteSlot}
-                onOpenNewPatientModal={() => {
-                  setSelectedPatientId('pat-emily-chen');
-                  setActiveTab('history');
-                }}
+                onOpenNewPatientModal={() => setActiveTab('new-patient')}
                 onOpenAiAssist={() => setIsAiAssistOpen(true)}
                 searchQuery={searchQuery}
               />
@@ -358,26 +494,59 @@ export default function App() {
               <h3 className="font-bold text-2xl text-slate-900">Active Prescriptions</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {prescriptions.map((rx) => (
-                  <div key={rx.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-2">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
-                        <Pill className="w-5 h-5 text-teal-800" />
-                        <h4 className="font-bold text-base text-slate-900">{rx.drugName}</h4>
+                  <div key={rx.id} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-2 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <Pill className="w-5 h-5 text-teal-800" />
+                          <h4 className="font-bold text-base text-slate-900">{rx.drugName}</h4>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-900 text-[10px] font-bold">
+                          {rx.status}
+                        </span>
                       </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-900 text-[10px] font-bold">
-                        {rx.status}
-                      </span>
+                      <p className="text-xs text-slate-600">Patient: <strong>{rx.patientName}</strong></p>
+                      <p className="text-xs text-slate-500">{rx.dosage} • {rx.frequency} ({rx.timing})</p>
+                      {rx.instructions && (
+                        <p className="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 mt-2">
+                          "{rx.instructions}"
+                        </p>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-600">Patient: <strong>{rx.patientName}</strong></p>
-                    <p className="text-xs text-slate-500">{rx.dosage} • {rx.frequency} ({rx.timing})</p>
-                    {rx.instructions && (
-                      <p className="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 mt-2">
-                        "{rx.instructions}"
-                      </p>
+                    {!isDoctor && (
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between mt-3">
+                        <span className="text-xs font-bold text-slate-700">Refill Price: $45.00</span>
+                        <button
+                          onClick={() => handleCustomPay(45, `Prescription Refill: ${rx.drugName} (${rx.dosage})`, 'prescription')}
+                          className="px-3 py-1.5 bg-teal-800 hover:bg-teal-900 text-white rounded-lg font-bold text-xs shadow-xs flex items-center gap-1 cursor-pointer"
+                        >
+                          <CreditCard className="w-3.5 h-3.5 text-teal-300" />
+                          <span>Order & Pay ($45)</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'billing' && (
+            <div className="p-4 md:p-8 max-w-6xl mx-auto">
+              {isDoctor ? (
+                <DoctorBilling
+                  payments={payments}
+                  onPayNow={handlePayNow}
+                  isLoading={isPaymentLoading}
+                />
+              ) : (
+                <PatientBilling
+                  payments={payments}
+                  onPayNow={handlePayNow}
+                  onCustomPay={handleCustomPay}
+                  isLoading={isPaymentLoading}
+                />
+              )}
             </div>
           )}
 
@@ -425,6 +594,20 @@ export default function App() {
               </div>
             </div>
           )}
+
+          {activeTab === 'new-patient' && (
+            <NewPatientForm
+              onSuccess={async () => {
+                try {
+                  const updatedPatients = await patientsApi.getPatients();
+                  setPatients(updatedPatients);
+                } catch (err) {
+                  console.error('Failed refreshing patients:', err);
+                }
+                setActiveTab('patients');
+              }}
+            />
+          )}
         </div>
 
         {/* Mobile Bottom Navigation for Patient */}
@@ -449,6 +632,7 @@ export default function App() {
         isOpen={isBookApptOpen}
         onClose={() => setIsBookApptOpen(false)}
         onBookAppointment={handleBookAppointment}
+        onPayAndBook={handlePayAndBookAppointment}
       />
 
       <AddSlotModal
@@ -462,6 +646,13 @@ export default function App() {
         onClose={() => setIsAiAssistOpen(false)}
         user={currentUser}
         medicalRecords={medicalRecords}
+      />
+
+      <PaymentSuccessModal
+        isOpen={paymentSuccessModalOpen}
+        onClose={() => setPaymentSuccessModalOpen(false)}
+        paymentId={confirmedPaymentId}
+        isSimulated={isSimulatedPayment}
       />
     </div>
   );

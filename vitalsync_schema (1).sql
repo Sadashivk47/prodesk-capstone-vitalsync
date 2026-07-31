@@ -12,6 +12,7 @@
 -- ============================================================
 
 -- Clean slate (safe to re-run while iterating locally)
+DROP TABLE IF EXISTS payments CASCADE;
 DROP TABLE IF EXISTS prescriptions CASCADE;
 DROP TABLE IF EXISTS medical_records CASCADE;
 DROP TABLE IF EXISTS availability_slots CASCADE;
@@ -259,6 +260,26 @@ CREATE TABLE patients_directory (
     status     VARCHAR(50) NOT NULL DEFAULT 'ACTIVE FILE'
 );
 
+-- ============================================================
+-- payments
+-- Holds doctor dues, consultation fees, and prescription payments.
+-- ============================================================
+CREATE TABLE payments (
+    id                SERIAL PRIMARY KEY,
+    user_id           INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type              VARCHAR(30) NOT NULL CHECK (type IN ('due', 'consultation', 'prescription', 'general')),
+    amount            NUMERIC(10, 2) NOT NULL,
+    description       TEXT NOT NULL,
+    due_date          TIMESTAMP,
+    status            VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'failed')),
+    stripe_session_id VARCHAR(255),
+    reference_id      INT,
+    created_at        TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_payments_user_id ON payments(user_id);
+CREATE INDEX idx_payments_status  ON payments(status);
+
 -- ---------- Biometrics seed (patient users 6-13 = ids 6-13) ----------
 INSERT INTO biometrics (patient_id, blood_pressure, blood_pressure_status, weight_lbs, weight_change_lbs, avg_daily_steps, step_goal) VALUES
 (6,  '118/76', 'Optimal',  142, -2, 8420, 10000),
@@ -284,7 +305,18 @@ INSERT INTO patients_directory (name, age, id_code, avatar_url, status) VALUES
 ('Aditya Sharma', 51, 'VS-MRN-9827', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200', 'ACTIVE FILE'),
 ('John Doe',      35, 'VS-MRN-9828', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200', 'ACTIVE FILE');
 
+-- ---------- Payments seed (doctor dues & patient payments) ----------
+INSERT INTO payments (user_id, type, amount, description, due_date, status, reference_id) VALUES
+(1,  'due',          250.00, 'Monthly Clinic Facility & Maintenance Fee', '2026-08-15 00:00:00', 'pending', NULL),
+(1,  'due',          120.00, 'Medical License & Malpractice Protection Renewal', '2026-08-30 00:00:00', 'pending', NULL),
+(1,  'due',          75.00,  'Annual Telehealth Platform Infrastructure Fee', '2026-07-01 00:00:00', 'paid',    NULL),
+(2,  'due',          200.00, 'General Clinic Administration & EHR Sync Fee', '2026-08-10 00:00:00', 'pending', NULL),
+(6,  'consultation', 80.00,  'Cardiology Virtual Consultation Fee', NULL,                  'paid',    1),
+(13, 'prescription', 45.00,  'Amoxicillin & Loratadine Prescription Order', NULL,                  'pending', 1),
+(13, 'general',      50.00,  'Lab Processing & Diagnostic Co-pay', NULL,                  'pending', NULL);
+
 -- Reset new sequences
 SELECT setval('biometrics_id_seq',        (SELECT MAX(id) FROM biometrics));
 SELECT setval('clinical_feed_id_seq',     (SELECT MAX(id) FROM clinical_feed));
 SELECT setval('patients_directory_id_seq',(SELECT MAX(id) FROM patients_directory));
+SELECT setval('payments_id_seq',          (SELECT MAX(id) FROM payments));

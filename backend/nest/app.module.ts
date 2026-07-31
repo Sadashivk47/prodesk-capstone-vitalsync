@@ -12,6 +12,7 @@ import { NestPrescriptionController } from "./prescriptions.controller.js";
 import { NestClinicalFeedController } from "./clinical-feed.controller.js";
 import { NestBiometricController } from "./biometrics.controller.js";
 import { NestAiController } from "./ai.controller.js";
+import { NestPaymentController } from "./payments.controller.js";
 
 import { AuthService } from "../services/AuthService.js";
 import { UsersService } from "../services/UsersService.js";
@@ -23,9 +24,11 @@ import { PrescriptionService } from "../services/PrescriptionService.js";
 import { ClinicalFeedService } from "../services/ClinicalFeedService.js";
 import { BiometricService } from "../services/BiometricService.js";
 import { AiService } from "../services/AiService.js";
+import { PaymentsService } from "../services/PaymentsService.js";
 import { JwtStrategy } from "../auth/jwt.strategy.js";
 
-const jwtSecret = process.env.JWT_SECRET || "vitalsync-dev-secret-change-in-production";
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) throw new Error("JWT_SECRET environment variable is required but not set.");
 const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
 
 @Module({
@@ -48,6 +51,7 @@ const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
     NestClinicalFeedController,
     NestBiometricController,
     NestAiController,
+    NestPaymentController,
   ],
   providers: [
     Reflector,
@@ -62,6 +66,7 @@ const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
     ClinicalFeedService,
     BiometricService,
     AiService,
+    PaymentsService,
   ],
 })
 export class AppModule {}

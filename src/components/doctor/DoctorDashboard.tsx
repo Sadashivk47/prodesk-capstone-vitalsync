@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Appointment, AvailabilitySlot, ClinicalFeedItem } from '../../types';
+import React, { useState, useMemo } from 'react';
+import { User, Appointment, AvailabilitySlot, ClinicalFeedItem } from '../../types';
 import {
   Calendar,
   Clock,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 interface DoctorDashboardProps {
+  user: User;
   appointments: Appointment[];
   availabilitySlots: AvailabilitySlot[];
   clinicalFeed: ClinicalFeedItem[];
@@ -26,7 +27,15 @@ interface DoctorDashboardProps {
   searchQuery: string;
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
 export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
+  user,
   appointments,
   availabilitySlots,
   clinicalFeed,
@@ -37,6 +46,12 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
   onOpenAiAssist,
   searchQuery,
 }) => {
+  const greeting = useMemo(() => {
+    const salutation = getGreeting();
+    const prefix = user.role === 'doctor' ? 'Dr. ' : '';
+    const displayName = user.name || 'Loading…';
+    return `${salutation}, ${prefix}${displayName}`;
+  }, [user.name, user.role]);
   const filteredAppointments = appointments.filter(
     (app) =>
       app.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,7 +64,7 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h3 className="text-2xl md:text-3xl font-bold text-slate-900">
-            Good morning, Dr. Sarah Miller
+            {greeting}
           </h3>
           <p className="text-slate-500 text-sm md:text-base mt-1">
             You have a busy schedule today with {appointments.length} appointments.

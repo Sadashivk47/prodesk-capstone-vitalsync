@@ -108,3 +108,20 @@ export interface ClinicalFeedItem {
   patientName?: string;
   type: 'lab' | 'urgent' | 'protocol';
 }
+
+export type PaymentType = 'due' | 'consultation' | 'prescription' | 'general';
+export type PaymentStatus = 'pending' | 'paid' | 'failed';
+
+export interface PaymentItem {
+  id: number | string;
+  userId?: number | string;
+  type: PaymentType;
+  amount: number;
+  description: string;
+  dueDate?: string;
+  status: PaymentStatus;
+  stripeSessionId?: string;
+  referenceId?: number | string;
+  createdAt?: string;
+}
+

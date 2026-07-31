@@ -6,12 +6,14 @@ interface BookAppointmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBookAppointment: (appointment: Appointment) => void;
+  onPayAndBook?: (appointment: Appointment) => void;
 }
 
 export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
   isOpen,
   onClose,
   onBookAppointment,
+  onPayAndBook,
 }) => {
   const [doctorName, setDoctorName] = useState('Dr. Sarah Miller');
   const [specialty, setSpecialty] = useState('Cardiology');
@@ -22,24 +24,33 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
 
   if (!isOpen) return null;
 
+  const getAppointmentData = (): Appointment => ({
+    id: `p-appt-${Date.now()}`,
+    patientId: 'pat-202',
+    patientName: 'Sarah Johnson',
+    patientInitials: 'SJ',
+    doctorName,
+    specialty,
+    visitType,
+    date,
+    time,
+    reason,
+    status: 'SCHEDULED',
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    onBookAppointment(getAppointmentData());
+    onClose();
+  };
 
-    const newAppointment: Appointment = {
-      id: `p-appt-${Date.now()}`,
-      patientId: 'pat-202',
-      patientName: 'Sarah Johnson',
-      patientInitials: 'SJ',
-      doctorName,
-      specialty,
-      visitType,
-      date,
-      time,
-      reason,
-      status: 'SCHEDULED',
-    };
-
-    onBookAppointment(newAppointment);
+  const handlePaySubmit = () => {
+    const appt = getAppointmentData();
+    if (onPayAndBook) {
+      onPayAndBook(appt);
+    } else {
+      onBookAppointment(appt);
+    }
     onClose();
   };
 
@@ -68,9 +79,9 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
               }}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-700 font-medium"
             >
-              <option value="Dr. Sarah Miller">Dr. Sarah Miller - Lead Cardiologist</option>
-              <option value="Dr. James Wilson">Dr. James Wilson - Cardiology Specialist</option>
-              <option value="Dr. Elena Rodriguez">Dr. Elena Rodriguez - General Practitioner</option>
+              <option value="Dr. Sarah Miller">Dr. Sarah Miller - Lead Cardiologist ($80)</option>
+              <option value="Dr. James Wilson">Dr. James Wilson - Cardiology Specialist ($80)</option>
+              <option value="Dr. Elena Rodriguez">Dr. Elena Rodriguez - General Practitioner ($60)</option>
             </select>
           </div>
 
@@ -147,20 +158,29 @@ export const BookAppointmentModal: React.FC<BookAppointmentModalProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end gap-2">
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-bold text-xs"
+              className="px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-bold text-xs"
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="px-5 py-2 bg-teal-800 text-white rounded-lg font-bold text-xs hover:bg-teal-900"
-            >
-              Confirm Booking
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="submit"
+                className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200"
+              >
+                Book Only
+              </button>
+              <button
+                type="button"
+                onClick={handlePaySubmit}
+                className="px-4 py-2 bg-teal-800 text-white rounded-lg font-bold text-xs hover:bg-teal-900 shadow-sm flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Pay Fee ($80)</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>

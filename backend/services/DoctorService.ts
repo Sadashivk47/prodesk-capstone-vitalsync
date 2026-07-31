@@ -77,53 +77,70 @@ export class DoctorService {
     emergencyContactName?: string;
     emergencyContactPhone?: string;
   }) {
-    const fullName = `${data.firstName} ${data.lastName}`.trim();
-    const email = data.email.toLowerCase();
-    const mrn = data.medicalRecordNumber || `VS-MRN-${Math.floor(1000 + Math.random() * 9000)}`;
+    const firstName = data.firstName?.trim() || "Patient";
+    const lastName = data.lastName?.trim() || "User";
+    const fullName = `${firstName} ${lastName}`.trim();
+    const email = data.email.toLowerCase().trim();
+    const mrn = data.medicalRecordNumber?.trim() || `VS-MRN-${Math.floor(1000 + Math.random() * 9000)}`;
+    const dob = data.dateOfBirth && data.dateOfBirth.trim().length > 0 ? data.dateOfBirth.trim() : "1996-05-20";
+    const avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
 
+    // 1. Save to users table (Schema columns: id, email, password_hash, role, first_name, last_name)
     const user = this.userRepo.create({
       email,
-      name: fullName,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      role: "patient",
-      avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
       passwordHash: "$2b$10$RnePUeytnMqzTNjxE2jbDu8S6fLHcCdQKRZY86RKO2kjt6Y2sZxmy",
-      memberSince: new Date().getFullYear().toString(),
+      role: "patient",
+      firstName,
+      lastName,
     });
+
+    // In-memory store fallback check for next ID
+    if (user.id == null) {
+      const existing = await this.userRepo.find();
+      const maxId = existing.reduce((max: number, u: User) => Math.max(max, Number(u.id) || 0), 0);
+      user.id = maxId + 1;
+    }
+
     const savedUser = await this.userRepo.save(user);
 
+    // 2. Save to patient_profiles table (Schema columns: user_id, medical_record_number, date_of_birth, blood_group, emergency_contact_name, emergency_contact_phone)
     const profile = this.patProfileRepo.create({
       userId: savedUser.id,
       medicalRecordNumber: mrn,
-      dateOfBirth: data.dateOfBirth || "1996-05-20",
+      dateOfBirth: dob,
       bloodGroup: data.bloodGroup || "O+",
       emergencyContactName: data.emergencyContactName || "Emergency Contact",
       emergencyContactPhone: data.emergencyContactPhone || "+1 (555) 000-1122",
     });
     await this.patProfileRepo.save(profile);
 
+    // 3. Save to patients_directory table (Cache view)
     let age = 28;
-    if (data.dateOfBirth) {
-      const yr = new Date(data.dateOfBirth).getFullYear();
+    if (dob) {
+      const yr = new Date(dob).getFullYear();
       if (!isNaN(yr)) age = new Date().getFullYear() - yr;
     }
 
-    const dirEntry = this.patDirRepo.create({
-      name: fullName,
-      age,
-      idCode: mrn,
-      avatarUrl: user.avatarUrl,
-      status: "ACTIVE FILE",
-    });
-    const savedDir = await this.patDirRepo.save(dirEntry);
+    try {
+      const dirEntry = this.patDirRepo.create({
+        id: savedUser.id,
+        name: fullName,
+        age,
+        idCode: mrn,
+        avatarUrl,
+        status: "ACTIVE FILE",
+      });
+      await this.patDirRepo.save(dirEntry);
+    } catch (err) {
+      console.warn("[DoctorService] Directory cache save notice:", err);
+    }
 
     return {
-      id: String(savedDir.id),
+      id: String(savedUser.id),
       name: fullName,
       age,
       idCode: mrn,
-      avatarUrl: user.avatarUrl,
+      avatarUrl,
       status: "ACTIVE FILE",
     };
   }

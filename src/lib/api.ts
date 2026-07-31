@@ -10,6 +10,7 @@ import {
   ClinicalFeedItem,
   DoctorProfile,
   PatientProfile,
+  PaymentItem,
 } from '../types';
 
 export const authApi = {
@@ -49,6 +50,20 @@ export const patientsApi = {
 
   async getPatientProfile(userId: string): Promise<PatientProfile> {
     const res = await apiClient.get(`/patients/profile/${userId}`);
+    return res.data;
+  },
+
+  async createPatient(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    dateOfBirth?: string;
+    bloodGroup?: string;
+    medicalRecordNumber?: string;
+    emergencyContactName?: string;
+    emergencyContactPhone?: string;
+  }): Promise<{ id: string; name: string }> {
+    const res = await apiClient.post('/patients', data);
     return res.data;
   },
 };
@@ -141,3 +156,27 @@ export const aiApi = {
     return res.data;
   },
 };
+
+export const paymentsApi = {
+  async getPayments(): Promise<PaymentItem[]> {
+    const res = await apiClient.get('/payments');
+    return res.data;
+  },
+
+  async createCheckoutSession(data: {
+    type: 'due' | 'consultation' | 'prescription' | 'general';
+    amount: number;
+    description: string;
+    referenceId?: number;
+    dueDate?: string;
+  }): Promise<{ checkoutUrl: string; sessionId: string; paymentId: number }> {
+    const res = await apiClient.post('/payments/create-checkout-session', data);
+    return res.data;
+  },
+
+  async confirmPayment(paymentId: number | string, sessionId: string): Promise<{ success: boolean; message: string; payment: PaymentItem }> {
+    const res = await apiClient.post('/payments/confirm', { paymentId: Number(paymentId), sessionId });
+    return res.data;
+  },
+};
+
