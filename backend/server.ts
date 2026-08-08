@@ -2,11 +2,12 @@ import "reflect-metadata";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
+import { NestFactory, HttpAdapterHost } from "@nestjs/core";
+import { ValidationPipe, Logger } from "@nestjs/common";
 
 import { initializeDatabase } from "./config/data-source.js";
 import { AppModule } from "./nest/app.module.js";
+import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter.js";
 
 const PORT = Number(process.env.PORT) || 3001;
 
@@ -38,7 +39,7 @@ async function startServer() {
       // Safety net: allow any *.vercel.app subdomain (preview deployments)
       if (incomingOrigin.endsWith(".vercel.app")) return callback(null, true);
       // Reject everything else
-      console.warn(`[CORS] Blocked origin: ${incomingOrigin}`);
+      new Logger("CORS").warn(`Blocked origin: ${incomingOrigin}`);
       callback(new Error(`CORS: origin ${incomingOrigin} is not allowed`));
     },
     methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -48,16 +49,27 @@ async function startServer() {
     optionsSuccessStatus: 204,
   });
 
+  // Phase 1 — Global Exception Filter
+  // Catches EVERY error and returns a clean, consistent JSON response.
+  // Prevents raw stack traces from leaking to clients.
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Phase 1 — Global Validation Pipe
+  // whitelist: strips any extra fields not in the DTO
+  // forbidNonWhitelisted: rejects the request if unknown fields are present
+  // transform: converts raw JSON to the typed DTO class
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      forbidNonWhitelisted: true,
       transform: true,
     }),
   );
 
+  const serverLogger = new Logger("Bootstrap");
   await app.listen(PORT, "0.0.0.0");
-  console.log(`✅ VitalSync API Server running on http://0.0.0.0:${PORT}`);
-  console.log(`   Allowed origins: ${[...allowedOrigins].join(", ")} + *.vercel.app`);
+  serverLogger.log(`✅ VitalSync API Server running on http://0.0.0.0:${PORT}`);
+  serverLogger.log(`   Allowed origins: ${[...allowedOrigins].join(", ")} + *.vercel.app`);
 }
 
 startServer();

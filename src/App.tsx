@@ -398,6 +398,7 @@ export default function App() {
               patientIdCode={selectedPatient.idCode}
               patientAvatarUrl={selectedPatient.avatarUrl}
               onOpenAddRecord={() => setIsAddRecordOpen(true)}
+              onOpenAiAssist={() => setIsAiAssistOpen(true)}
               searchQuery={searchQuery}
             />
           )}

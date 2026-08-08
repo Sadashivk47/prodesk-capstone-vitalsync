@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
+import { Reflector, APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
+import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { HealthController } from "./health.controller.js";
 import { NestAuthController } from "./auth.controller.js";
 import { NestDoctorController } from "./doctors.controller.js";
@@ -33,6 +34,10 @@ const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
 
 @Module({
   imports: [
+    // Phase 3 — Rate Limiting
+    // Global default: 20 requests per 60 seconds per IP.
+    // Individual routes can override this with @Throttle() decorator.
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.register({
       global: true,
@@ -55,6 +60,9 @@ const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
   ],
   providers: [
     Reflector,
+    // Phase 3 — Global Rate-Limit Guard
+    // Enforces ThrottlerModule limits on every route automatically.
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     JwtStrategy,
     UsersService,
     AuthService,

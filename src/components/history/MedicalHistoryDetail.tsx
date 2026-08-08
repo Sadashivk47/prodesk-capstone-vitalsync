@@ -11,6 +11,8 @@ import {
   ChevronUp,
   Pill,
   Search,
+  Bot,
+  Sparkles,
 } from 'lucide-react';
 
 interface MedicalHistoryDetailProps {
@@ -20,6 +22,8 @@ interface MedicalHistoryDetailProps {
   patientIdCode?: string;
   patientAvatarUrl?: string;
   onOpenAddRecord: () => void;
+  /** Phase 2 — Opens the AI Clinical Summary modal */
+  onOpenAiAssist?: () => void;
   searchQuery?: string;
 }
 
@@ -30,6 +34,7 @@ export const MedicalHistoryDetail: React.FC<MedicalHistoryDetailProps> = ({
   patientIdCode = '#VC-9821-EC',
   patientAvatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
   onOpenAddRecord,
+  onOpenAiAssist,
   searchQuery = '',
 }) => {
   const [expandedRecordIds, setExpandedRecordIds] = useState<Record<string, boolean>>({
@@ -91,6 +96,17 @@ export const MedicalHistoryDetail: React.FC<MedicalHistoryDetailProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+          {/* Phase 2 — Generate AI Summary button (doctor-only feature) */}
+          {onOpenAiAssist && (
+            <button
+              onClick={onOpenAiAssist}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-teal-800 text-white rounded-lg font-bold text-xs hover:bg-teal-900 transition-colors cursor-pointer shadow-sm"
+              title="Generate an AI-powered clinical summary for this patient"
+            >
+              <Sparkles className="w-4 h-4" />
+              Generate AI Summary
+            </button>
+          )}
           <button
             onClick={handleDownloadPDF}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 border border-teal-800 text-teal-800 rounded-lg font-bold text-xs hover:bg-teal-50 transition-colors cursor-pointer"

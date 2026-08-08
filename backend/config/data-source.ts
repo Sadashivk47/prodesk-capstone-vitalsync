@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import { Logger } from "@nestjs/common";
 import dotenv from "dotenv";
 
 import { User } from "../entities/User.js";
@@ -15,6 +16,10 @@ import { Biometric } from "../entities/Biometric.js";
 import { Payment } from "../entities/Payment.js";
 
 dotenv.config();
+
+// Phase 3 — Replace console.log with NestJS Logger
+// Logger is environment-aware: can be silenced in production without code changes.
+const dbLogger = new Logger("DataSource");
 
 let rawDbUrl = process.env.DATABASE_URL;
 if (rawDbUrl) {
@@ -422,18 +427,18 @@ export async function initializeDatabase() {
   }
 
   if (!dbUrl || dbUrl.includes("localhost")) {
-    console.log("[TypeORM] No external DATABASE_URL. Using In-Memory Repository Layer.");
+    dbLogger.log("No external DATABASE_URL. Using In-Memory Repository Layer.");
     return;
   }
 
   try {
     if (!AppDataSource.isInitialized) {
       await AppDataSource.initialize();
-      console.log("[TypeORM] Connected to Neon PostgreSQL Database successfully.");
+      dbLogger.log("Connected to Neon PostgreSQL Database successfully.");
       await seedDatabaseIfEmpty();
     }
   } catch (error) {
-    console.warn("[TypeORM] PostgreSQL connection failed. Falling back to in-memory store:", error);
+    dbLogger.warn("PostgreSQL connection failed. Falling back to in-memory store.");
   }
 }
 
@@ -446,7 +451,7 @@ async function seedDatabaseIfEmpty() {
     const userRepo = AppDataSource.getRepository(User);
     const count = await userRepo.count();
     if (count === 0) {
-      console.log("[TypeORM] Database is empty. Seeding initial clinical data...");
+      dbLogger.log("Database is empty. Seeding initial clinical data...");
 
       // ── Users (matches schema seed: doctors 1-5, patients 6-13)
       const usersData = [
@@ -571,7 +576,7 @@ async function seedDatabaseIfEmpty() {
         payRepo.create({ userId: pat13.id, type: "general",      amount: 50.00,  description: "Lab Processing & Diagnostic Co-pay", status: "pending" }),
       ]);
 
-      console.log("[TypeORM] PostgreSQL Seeding complete.");
+      dbLogger.log("PostgreSQL Seeding complete.");
     }
   } catch (err) {
     console.error("[TypeORM] Error seeding PostgreSQL database:", err);

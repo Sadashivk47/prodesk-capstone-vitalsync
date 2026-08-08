@@ -27,5 +27,13 @@ pnpm-debug.log*
 # Environment files
 .env*
 !.env.example
-video-demo-guide.md
+
+# Internal documentation, prompt, and task plan files
+week16taskplan.md
+sprint16_what_we_built.md
+sprint_15_checklist_prompt.md
+Prompts.md
+EXPLANATION.md
 DEPLOYMENT_GUIDE.md
+video-demo-guide.md
+implementation_plan_stripe*

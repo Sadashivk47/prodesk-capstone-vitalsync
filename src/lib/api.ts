@@ -151,8 +151,23 @@ export const biometricsApi = {
 };
 
 export const aiApi = {
+  /** Legacy: sends raw patient data + optional custom prompt to the server. */
   async generateClinicalSummary(patientData: any, prompt?: string): Promise<{ summary: string; recommendations?: string[] }> {
     const res = await apiClient.post('/ai/clinical-summary', { patientData, prompt });
+    return res.data;
+  },
+
+  /**
+   * Phase 2 — Sprint 16:
+   * Calls POST /api/ai/summarize-history/:patientId on YOUR OWN backend.
+   * The backend fetches the patient's records + prescriptions, builds a prompt,
+   * and calls Gemini server-side. The Gemini API key is NEVER sent to the browser.
+   *
+   * Protected: JWT required, doctor role only.
+   * Rate limited: 5 calls per 60 seconds.
+   */
+  async summarizePatientHistory(patientId: string): Promise<{ summary: string }> {
+    const res = await apiClient.post(`/ai/summarize-history/${patientId}`);
     return res.data;
   },
 };
