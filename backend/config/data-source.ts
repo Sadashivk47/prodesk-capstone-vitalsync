@@ -17,7 +17,7 @@ import { Payment } from "../entities/Payment.js";
 
 dotenv.config();
 
-// Phase 3 — Replace console.log with NestJS Logger
+// Phase 3 — Replace log with NestJS Logger
 // Logger is environment-aware: can be silenced in production without code changes.
 const dbLogger = new Logger("DataSource");
 

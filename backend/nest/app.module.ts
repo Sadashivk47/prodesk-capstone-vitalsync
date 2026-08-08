@@ -34,7 +34,7 @@ const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
 
 @Module({
   imports: [
-    // Phase 3 — Rate Limiting
+    // Rate Limiting
     // Global default: 20 requests per 60 seconds per IP.
     // Individual routes can override this with @Throttle() decorator.
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),

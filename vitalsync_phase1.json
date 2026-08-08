@@ -1,0 +1,195 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VitalSync - Phase 1 Validation Tests",
+    "version": "1.0.0",
+    "description": "Testing Error Handling & Input Validation for VitalSync Backend"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001/api",
+      "description": "Local Backend Server"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "TC1/TC2/TC6: Registration Testing",
+        "description": "Handles Test Cases 1, 2, and 6 for strict input validation, field formats, and duplicate emails.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "test1@vitalsync.dev" },
+                  "name": { "type": "string", "example": "Test User" },
+                  "password": { "type": "string", "example": "Password@123" },
+                  "role": { "type": "string", "example": "patient" },
+                  "isAdmin": { "type": "boolean", "example": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "TC1/TC2: Bad Request / Input Validation Failure",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GlobalErrorResponse" },
+                "examples": {
+                  "TC1_ExtraFields": {
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": ["property isAdmin should not exist"],
+                      "path": "/api/auth/register",
+                      "timestamp": "2026-08-08T10:00:00.000Z"
+                    }
+                  },
+                  "TC2_InvalidFormat": {
+                    "value": {
+                      "success": false,
+                      "statusCode": 400,
+                      "message": ["email must be an email", "role must be one of the following values: doctor, patient"],
+                      "path": "/api/auth/register",
+                      "timestamp": "2026-08-08T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "TC6: Duplicate Email Registration",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GlobalErrorResponse" },
+                "example": {
+                  "success": false,
+                  "statusCode": 409,
+                  "message": "Email already registered",
+                  "path": "/api/auth/register",
+                  "timestamp": "2026-08-08T10:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "TC3/TC4/TC7: Authentication Testing",
+        "description": "Handles Test Cases 3, 4, and 7 for missing fields, invalid credentials, and rate limits.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "sarah.miller@vitalsync.dev" },
+                  "password": { "type": "string", "example": "WrongPassword123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "TC3: Missing Required Fields",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GlobalErrorResponse" },
+                "example": {
+                  "success": false,
+                  "statusCode": 400,
+                  "message": ["password must be longer than or equal to 1 characters", "password must be a string"],
+                  "path": "/api/auth/login",
+                  "timestamp": "2026-08-08T10:00:00.000Z"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "TC4: Invalid Credentials",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GlobalErrorResponse" },
+                "example": {
+                  "success": false,
+                  "statusCode": 401,
+                  "message": "Invalid email or password",
+                  "path": "/api/auth/login",
+                  "timestamp": "2026-08-08T10:00:00.000Z"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TC7: Rate Limit Exceeded (Hit 6x in 60s)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GlobalErrorResponse" },
+                "example": {
+                  "success": false,
+                  "statusCode": 429,
+                  "message": "ThrottlerException: Too Many Requests",
+                  "path": "/api/auth/login",
+                  "timestamp": "2026-08-08T10:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/non-existent-route": {
+      "get": {
+        "summary": "TC5: Non-existent Route (404 Error Filter)",
+        "description": "Tests requests to unmapped endpoints to evaluate the global filter mechanism.",
+        "responses": {
+          "404": {
+            "description": "Route Not Found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GlobalErrorResponse" },
+                "example": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Cannot GET /api/non-existent-route",
+                  "path": "/api/non-existent-route",
+                  "timestamp": "2026-08-08T10:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GlobalErrorResponse": {
+        "type": "object",
+        "required": ["success", "statusCode", "message", "path", "timestamp"],
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "statusCode": { "type": "integer", "example": 400 },
+          "message": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ],
+            "example": "..."
+          },
+          "path": { "type": "string", "example": "/api/..." },
+          "timestamp": { "type": "string", "format": "date-time", "example": "2026-08-08T10:00:00.000Z" }
+        }
+      }
+    }
+  }
+}
