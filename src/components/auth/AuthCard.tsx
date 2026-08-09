@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { User, Role } from '../../types';
 import { auth } from '../../lib/auth';
 import { authApi } from '../../lib/api';
-import { Activity, ShieldCheck, UserCheck, Stethoscope, Eye, EyeOff } from 'lucide-react';
+import { Activity, ShieldCheck, UserCheck, Stethoscope, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 interface AuthCardProps {
   onLoginSuccess: (user: User) => void;
+  onBackToLanding?: () => void;
 }
 
-export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
+export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess, onBackToLanding }) => {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,18 +62,28 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
     }
   };
 
-
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-slate-100 via-slate-50 to-teal-50/50">
-      <main className="w-full max-w-[440px] animate-in fade-in duration-500">
-        <div className="bg-white rounded-xl p-8 md:p-10 shadow-sm border border-slate-200 flex flex-col items-center">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f8f3eb] text-[#1d1c17] font-sans-dm relative">
+      {/* Back to Landing Page link */}
+      {onBackToLanding && (
+        <button
+          onClick={onBackToLanding}
+          className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-sm font-medium text-[#444655] hover:text-[#2849e5] bg-white/80 backdrop-blur-xs px-4 py-2 rounded-full border border-[#e7e2da] shadow-xs hover:border-[#a2baff] transition-all cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Home</span>
+        </button>
+      )}
+
+      <main className="w-full max-w-[460px] animate-in fade-in duration-500 my-10">
+        <div className="bg-white rounded-3xl p-8 md:p-10 shadow-warm-xl border border-[#e7e2da] flex flex-col items-center">
           {/* Logo & Brand Header */}
           <div className="mb-8 flex flex-col items-center text-center">
-            <div className="w-14 h-14 bg-teal-800 text-teal-300 rounded-2xl flex items-center justify-center mb-3 shadow-md shadow-teal-900/10">
-              <Activity className="w-8 h-8 text-teal-300" />
+            <div className="w-14 h-14 bg-[#2849e5] text-white rounded-2xl flex items-center justify-center mb-3 shadow-warm-md">
+              <Activity className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">VitalSync</h1>
-            <p className="text-sm text-slate-500 mt-1 font-medium">Clinical Intelligence Platform</p>
+            <h1 className="text-3xl font-serif-display font-normal text-[#1d1c17] tracking-tight">VitalSync</h1>
+            <p className="text-xs text-[#444655] mt-1 font-medium tracking-wide uppercase">Clinical Intelligence Platform</p>
           </div>
 
           {!isRegisterMode ? (
@@ -80,7 +91,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
             <>
               <form onSubmit={handleSignIn} className="w-full space-y-4">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider" htmlFor="email">
+                  <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider" htmlFor="email">
                     EMAIL ADDRESS
                   </label>
                   <input
@@ -90,16 +101,16 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="dr.smith@hospital.com"
                     required
-                    className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
+                    className="w-full h-12 px-4 rounded-xl border border-[#e7e2da] bg-[#f8f3eb]/40 text-[#1d1c17] text-sm focus:ring-2 focus:ring-[#2849e5] focus:bg-white focus:outline-none transition-all placeholder:text-[#757687]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider" htmlFor="password">
+                    <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider" htmlFor="password">
                       PASSWORD
                     </label>
-                    <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-teal-800 hover:underline">
+                    <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-[#2849e5] hover:underline">
                       FORGOT?
                     </a>
                   </div>
@@ -111,12 +122,12 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="w-full h-12 px-4 pr-11 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
+                      className="w-full h-12 px-4 pr-11 rounded-xl border border-[#e7e2da] bg-[#f8f3eb]/40 text-[#1d1c17] text-sm focus:ring-2 focus:ring-[#2849e5] focus:bg-white focus:outline-none transition-all placeholder:text-[#757687]"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-800 transition-colors cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757687] hover:text-[#2849e5] transition-colors cursor-pointer"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -125,7 +136,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                 </div>
 
                 {errorMessage && (
-                  <div className="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+                  <div className="text-xs text-[#ba1a1a] bg-[#ffdad6]/50 p-3 rounded-xl border border-[#ffdad6]">
                     {errorMessage}
                   </div>
                 )}
@@ -133,24 +144,24 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 bg-teal-800 text-white font-semibold text-base rounded-lg hover:bg-teal-900 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-sm shadow-teal-900/10"
+                  className="w-full h-12 bg-[#2849e5] hover:bg-[#4865ff] text-white font-medium text-base rounded-full active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-warm-md"
                 >
                   {isLoading ? 'Signing in...' : 'Sign in'}
                 </button>
 
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 text-center mb-1">
-                    Demo credentials are not stored in the client.
+                <div className="pt-3 border-t border-[#e7e2da]">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#757687] text-center mb-1">
+                    Demo credentials are pre-seeded in the database.
                   </p>
-                  <p className="text-[11px] text-slate-500 text-center">
-                    Use the seeded user logins from the deployment notes.
+                  <p className="text-[11px] text-[#444655] text-center">
+                    Use doctor or patient email logins to access your environment.
                   </p>
                 </div>
               </form>
 
-              {/* Register link sits OUTSIDE the form so it never triggers sign-in submit */}
+              {/* Register link */}
               <div className="pt-4 text-center w-full">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-[#444655]">
                   Don't have an account?{' '}
                   <button
                     type="button"
@@ -158,7 +169,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                       setIsRegisterMode(true);
                       setErrorMessage('');
                     }}
-                    className="text-teal-800 font-semibold hover:underline cursor-pointer"
+                    className="text-[#2849e5] font-semibold hover:underline cursor-pointer"
                   >
                     Register
                   </button>
@@ -169,31 +180,31 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
             /* Registration Form */
             <form onSubmit={handleRegister} className="w-full space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">FULL NAME</label>
+                <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider">FULL NAME</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Dr. Sarah Miller or Sarah Johnson"
                   required
-                  className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
+                  className="w-full h-12 px-4 rounded-xl border border-[#e7e2da] bg-[#f8f3eb]/40 text-[#1d1c17] text-sm focus:ring-2 focus:ring-[#2849e5] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">EMAIL ADDRESS</label>
+                <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider">EMAIL ADDRESS</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.name@hospital.com"
                   required
-                  className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
+                  className="w-full h-12 px-4 rounded-xl border border-[#e7e2da] bg-[#f8f3eb]/40 text-[#1d1c17] text-sm focus:ring-2 focus:ring-[#2849e5] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">PASSWORD (MIN 8 CHARS)</label>
+                <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider">PASSWORD (MIN 8 CHARS)</label>
                 <div className="relative">
                   <input
                     type={showRegPassword ? 'text' : 'password'}
@@ -202,12 +213,12 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                     placeholder="••••••••"
                     required
                     minLength={8}
-                    className="w-full h-12 px-4 pr-11 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
+                    className="w-full h-12 px-4 pr-11 rounded-xl border border-[#e7e2da] bg-[#f8f3eb]/40 text-[#1d1c17] text-sm focus:ring-2 focus:ring-[#2849e5] focus:bg-white focus:outline-none transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-800 transition-colors cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757687] hover:text-[#2849e5] transition-colors cursor-pointer"
                     aria-label={showRegPassword ? 'Hide password' : 'Show password'}
                   >
                     {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -216,15 +227,15 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">ACCOUNT ROLE</label>
+                <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider">ACCOUNT ROLE</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setRole('doctor')}
-                    className={`py-2.5 px-3 rounded-lg text-xs font-bold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`py-2.5 px-3 rounded-full text-xs font-bold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                       role === 'doctor'
-                        ? 'bg-teal-800 text-white border-teal-800 shadow-sm'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-[#2849e5] text-white border-[#2849e5] shadow-xs'
+                        : 'bg-[#f8f3eb] text-[#444655] border-[#e7e2da] hover:bg-[#f2ede5]'
                     }`}
                   >
                     <Stethoscope className="w-4 h-4" /> Doctor
@@ -232,10 +243,10 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                   <button
                     type="button"
                     onClick={() => setRole('patient')}
-                    className={`py-2.5 px-3 rounded-lg text-xs font-bold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`py-2.5 px-3 rounded-full text-xs font-bold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                       role === 'patient'
-                        ? 'bg-teal-800 text-white border-teal-800 shadow-sm'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-[#2849e5] text-white border-[#2849e5] shadow-xs'
+                        : 'bg-[#f8f3eb] text-[#444655] border-[#e7e2da] hover:bg-[#f2ede5]'
                     }`}
                   >
                     <UserCheck className="w-4 h-4" /> Patient
@@ -245,19 +256,19 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
 
               {role === 'doctor' && (
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">SPECIALTY</label>
+                  <label className="block text-xs font-semibold text-[#444655] uppercase tracking-wider">SPECIALTY</label>
                   <input
                     type="text"
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value)}
                     placeholder="e.g. Lead Cardiologist"
-                    className="w-full h-12 px-4 rounded-lg border border-slate-200 bg-slate-50/50 text-slate-900 text-sm focus:ring-2 focus:ring-teal-700 focus:bg-white focus:outline-none transition-all"
+                    className="w-full h-12 px-4 rounded-xl border border-[#e7e2da] bg-[#f8f3eb]/40 text-[#1d1c17] text-sm focus:ring-2 focus:ring-[#2849e5] focus:bg-white focus:outline-none transition-all"
                   />
                 </div>
               )}
 
               {errorMessage && (
-                <div className="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+                <div className="text-xs text-[#ba1a1a] bg-[#ffdad6]/50 p-3 rounded-xl border border-[#ffdad6]">
                   {errorMessage}
                 </div>
               )}
@@ -265,13 +276,13 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-teal-800 text-white font-semibold text-base rounded-lg hover:bg-teal-900 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+                className="w-full h-12 bg-[#2849e5] hover:bg-[#4865ff] text-white font-medium text-base rounded-full active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 shadow-warm-md"
               >
                 {isLoading ? 'Creating account...' : 'Create Account'}
               </button>
 
               <div className="pt-4 text-center">
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-[#444655]">
                   Already have an account?{' '}
                   <button
                     type="button"
@@ -279,7 +290,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
                       setIsRegisterMode(false);
                       setErrorMessage('');
                     }}
-                    className="text-teal-800 font-semibold hover:underline cursor-pointer"
+                    className="text-[#2849e5] font-semibold hover:underline cursor-pointer"
                   >
                     Sign in
                   </button>
@@ -289,12 +300,13 @@ export const AuthCard: React.FC<AuthCardProps> = ({ onLoginSuccess }) => {
           )}
         </div>
 
-        <div className="mt-4 text-center">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-teal-700" /> SECURE ACCESS • ISO 27001 CERTIFIED
+        <div className="mt-6 text-center">
+          <p className="text-xs font-semibold text-[#757687] uppercase tracking-widest flex items-center justify-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-[#2849e5]" /> SECURE ACCESS • ISO 27001 CERTIFIED
           </p>
         </div>
       </main>
     </div>
   );
 };
+

@@ -1,0 +1,452 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>VitalSync | Warm Clinical Platform</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=DM+Serif+Display:ital@0;1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "secondary": "#445c9a",
+                            "surface-variant": "#e7e2da",
+                            "on-secondary-fixed": "#001848",
+                            "surface-container-highest": "#e7e2da",
+                            "primary-fixed": "#dee0ff",
+                            "on-surface": "#1d1c17",
+                            "on-primary-container": "#fffeff",
+                            "on-background": "#1d1c17",
+                            "error": "#ba1a1a",
+                            "surface-dim": "#ded9d2",
+                            "on-secondary-fixed-variant": "#2b4481",
+                            "surface": "#fef9f1",
+                            "error-container": "#ffdad6",
+                            "on-secondary-container": "#2f4886",
+                            "secondary-fixed": "#dae2ff",
+                            "tertiary-fixed-dim": "#c6c1f7",
+                            "on-error-container": "#93000a",
+                            "primary": "#2849e5",
+                            "primary-fixed-dim": "#bac3ff",
+                            "primary-container": "#4865ff",
+                            "on-surface-variant": "#444655",
+                            "surface-container-low": "#f8f3eb",
+                            "inverse-primary": "#bac3ff",
+                            "surface-tint": "#2b4be7",
+                            "outline": "#757687",
+                            "on-primary": "#ffffff",
+                            "surface-container-high": "#ece8e0",
+                            "on-tertiary-fixed": "#191541",
+                            "on-primary-fixed-variant": "#002eca",
+                            "tertiary-container": "#7470a1",
+                            "inverse-on-surface": "#f5f0e8",
+                            "on-tertiary-container": "#fffdff",
+                            "tertiary-fixed": "#e4dfff",
+                            "surface-container-lowest": "#ffffff",
+                            "secondary-container": "#a2baff",
+                            "background": "#fef9f1",
+                            "surface-bright": "#fef9f1",
+                            "on-secondary": "#ffffff",
+                            "secondary-fixed-dim": "#b2c5ff",
+                            "on-error": "#ffffff",
+                            "surface-container": "#f2ede5",
+                            "tertiary": "#5b5787",
+                            "outline-variant": "#c4c5d8",
+                            "on-tertiary-fixed-variant": "#45416f",
+                            "inverse-surface": "#32302b",
+                            "on-tertiary": "#ffffff",
+                            "on-primary-fixed": "#00105b"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "margin-mobile": "20px",
+                            "padding-card": "32px",
+                            "gap-section": "64px",
+                            "margin-desktop": "80px",
+                            "base": "8px",
+                            "gutter": "24px"
+                    },
+                    "fontFamily": {
+                            "headline-md": [
+                                    "DM Serif Display"
+                            ],
+                            "label-sm": [
+                                    "DM Sans"
+                            ],
+                            "label-md": [
+                                    "DM Sans"
+                            ],
+                            "display-lg": [
+                                    "DM Serif Display"
+                            ],
+                            "body-lg": [
+                                    "DM Sans"
+                            ],
+                            "display-lg-mobile": [
+                                    "DM Serif Display"
+                            ],
+                            "body-md": [
+                                    "DM Sans"
+                            ],
+                            "headline-sm": [
+                                    "DM Serif Display"
+                            ]
+                    },
+                    "fontSize": {
+                            "headline-md": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "label-sm": [
+                                    "12px",
+                                    {
+                                            "lineHeight": "16px",
+                                            "letterSpacing": "0.05em",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "label-md": [
+                                    "14px",
+                                    {
+                                            "lineHeight": "20px",
+                                            "letterSpacing": "0.02em",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "display-lg": [
+                                    "48px",
+                                    {
+                                            "lineHeight": "56px",
+                                            "letterSpacing": "-0.02em",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "body-lg": [
+                                    "18px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "display-lg-mobile": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "letterSpacing": "-0.01em",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "body-md": [
+                                    "16px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "headline-sm": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "32px",
+                                            "fontWeight": "400"
+                                    }
+                            ]
+                    }
+            },
+                },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f8f3eb; /* Enforce exact prompt color for background override, even if theme has a different name */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Custom warm shadows requested by style guide */
+        .shadow-warm-xl {
+            box-shadow: 0 20px 40px -5px rgba(75, 68, 57, 0.1), 0 10px 20px -5px rgba(75, 68, 57, 0.04);
+        }
+        .shadow-warm-md {
+            box-shadow: 0 10px 20px -5px rgba(75, 68, 57, 0.1);
+        }
+        
+        .card-hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -5px rgba(75, 68, 57, 0.15), 0 10px 20px -5px rgba(75, 68, 57, 0.08);
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        /* Gentle gradient text */
+        .text-gradient {
+            background: linear-gradient(135deg, #2849e5, #a2baff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Specific accent colors from prompt not fully covered in tailwind config */
+        .bg-blossom-tint { background-color: rgba(255, 218, 214, 0.4); } /* Soft pinkish/error container tint */
+        .bg-forest-tint { background-color: rgba(162, 186, 255, 0.2); } /* Using secondary container for cool tone */
+        .bg-stone-muted { background-color: #e7e2da; } /* surface-variant */
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar Component (from JSON) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-gutter px-4 md:px-margin-desktop py-4 pointer-events-none">
+<nav class="bg-surface/80 shadow-[0_8px_32px_rgba(75,68,57,0.1)] backdrop-blur-md rounded-full mt-4 mx-auto max-w-fit px-6 py-3 flex items-center justify-between gap-8 pointer-events-auto shadow-xl">
+<!-- Brand -->
+<a class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">vital_signs</span>
+                VitalSync
+            </a>
+<!-- Links (Web) -->
+<ul class="hidden md:flex items-center gap-6">
+<li class="">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#features">Features</a>
+</li>
+<li class="">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#how-it-works">How it Works</a>
+</li>
+<li class="">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#security">Security</a>
+</li>
+</ul>
+<!-- Trailing Action -->
+<button class="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md rounded-full px-6 py-2 transition-all scale-95 hover:scale-100 duration-200">
+                Get Started
+            </button>
+</nav>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-32 md:pt-48 pb-24">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-4 md:px-margin-desktop text-center fade-in-up" style="animation-play-state: running;">
+<div class="inline-flex items-center gap-2 bg-secondary-fixed/50 border border-secondary-container rounded-full px-4 py-1.5 mb-8">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-label-sm text-label-sm text-on-secondary-fixed-variant uppercase tracking-wider">AI-POWERED CLINICAL PLATFORM</span>
+</div>
+<div class="relative max-w-4xl mx-auto mb-12">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background relative z-10 leading-tight">
+                    Unifying clinical workflows with the power of human-centered AI.
+                </h1>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">
+                Designed to reduce cognitive load and administrative friction for both healthcare providers and their patients.
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+<button class="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md rounded-full px-8 py-4 shadow-warm-md transition-all hover:scale-105">
+                    Explore Platform
+                </button>
+<button class="bg-surface border border-secondary-container hover:bg-surface-container-low text-on-surface font-label-md text-label-md rounded-full px-8 py-4 shadow-sm transition-all">
+                    Book a Demo
+                </button>
+</div>
+<!-- Decorative Visuals - Abstract representations since no direct images requested in hero -->
+<div class="mt-20 relative h-[400px] w-full max-w-5xl mx-auto rounded-[32px] bg-surface-container-highest/20 overflow-hidden shadow-warm-xl border border-surface-variant/50">
+<img class="w-full h-full object-cover opacity-90 mix-blend-multiply" data-alt="A clean, minimalist UI dashboard mockup for a modern clinical platform. The interface features soft cream backgrounds, rounded pill-shaped elements, and high-contrast sophisticated serif typography. Subtle ambient warm shadows separate cards showing patient schedules and AI-generated clinical summaries. The overall mood is deeply calming, professional, and humanist, bathed in soft, diffused studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT0Qz8W92qs4Fs1JqAKGQGpEJZLj70nyCQnLDU13YJZ82GpifbOWxr-HzDwqkr9n-xUTvyhK7ndLkDT5VRuoKK4zJxi1ayRGVPIQhnsEDzkpMe5le3lh5wdTrd_K9kY2uhhGXR1yFBJM3waVhnNHuNzlz3LN6lNvLsVX4u5phtoLBvZzYuA_u3unON06GUES5FI5KHzxM6MWVYjlOEFOmIEmlGflxsZn-DwF1TrV3FA0HOf_VWLsTivg">
+</div>
+</section>
+<!-- Trust Strip -->
+<section class="max-w-7xl mx-auto px-4 md:px-margin-desktop py-gap-section fade-in-up delay-100 border-b border-surface-variant/30" style="animation-play-state: running;">
+<div class="flex flex-wrap justify-center gap-8 md:gap-16 items-center">
+<div class="flex items-center gap-3 text-on-surface-variant opacity-80">
+<span class="material-symbols-outlined text-tertiary">lock</span>
+<span class="font-label-md text-label-md">Bank-level encryption</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant opacity-80">
+<span class="material-symbols-outlined text-tertiary">admin_panel_settings</span>
+<span class="font-label-md text-label-md">Role-based access control</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant opacity-80">
+<span class="material-symbols-outlined text-tertiary">bolt</span>
+<span class="font-label-md text-label-md">Sub-second AI summaries</span>
+</div>
+</div>
+</section>
+<!-- Features (Bento Grid Style) -->
+<section class="max-w-7xl mx-auto px-4 md:px-margin-desktop py-gap-section fade-in-up delay-200" id="features" style="animation-play-state: running;">
+<div class="text-center mb-16">
+<h2 class="font-headline-md text-headline-md text-on-background mb-4">Built for two kinds of users</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">Tailored experiences that respect the distinct needs of medical professionals and the people in their care.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Doctors Column -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4 mb-4 pl-4 border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">stethoscope</span>
+<h3 class="font-headline-sm text-headline-sm text-on-background">For Providers</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-padding-card rounded-2xl shadow-warm-md card-hover-lift relative group overflow-hidden">
+<span class="material-symbols-outlined absolute top-6 right-6 text-outline-variant group-hover:text-primary transition-colors">arrow_outward</span>
+<span class="material-symbols-outlined text-primary text-4xl mb-6 bg-primary-fixed/30 p-3 rounded-full" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<h4 class="font-label-md text-label-md text-on-background mb-2">Clinical Dashboard</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Unified view of your day, instantly prioritizing critical tasks.</p>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-padding-card rounded-2xl shadow-warm-md card-hover-lift relative group overflow-hidden">
+<span class="material-symbols-outlined absolute top-6 right-6 text-outline-variant group-hover:text-primary transition-colors">arrow_outward</span>
+<span class="material-symbols-outlined text-tertiary text-4xl mb-6 bg-tertiary-fixed/30 p-3 rounded-full" style="font-variation-settings: 'FILL' 1;">summarize</span>
+<h4 class="font-label-md text-label-md text-on-background mb-2">AI Summarizer</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Automated chart generation from natural dialogue.</p>
+</div>
+<!-- Card 3 (Full width span in sub-grid) -->
+<div class="bg-surface-container-lowest p-padding-card rounded-2xl shadow-warm-md card-hover-lift relative group overflow-hidden sm:col-span-2">
+<span class="material-symbols-outlined absolute top-6 right-6 text-outline-variant group-hover:text-primary transition-colors">arrow_outward</span>
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-secondary text-4xl bg-secondary-fixed/30 p-3 rounded-full" style="font-variation-settings: 'FILL' 1;">folder_shared</span>
+<h4 class="font-label-md text-label-md text-on-background">Patient Records &amp; Availability</h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Seamless scheduling logic integrated directly with robust electronic health record management.</p>
+</div>
+</div>
+</div>
+<!-- Patients Column -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4 mb-4 pl-4 border-l-4 border-secondary-container">
+<span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<h3 class="font-headline-sm text-headline-sm text-on-background">For Patients</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
+<!-- Card 1 -->
+<div class="bg-blossom-tint p-padding-card rounded-2xl shadow-warm-md card-hover-lift relative group border border-surface-variant/20">
+<span class="material-symbols-outlined absolute top-6 right-6 text-on-surface-variant group-hover:text-on-background transition-colors">arrow_outward</span>
+<span class="material-symbols-outlined text-error text-4xl mb-6 bg-surface/50 p-3 rounded-full" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<h4 class="font-label-md text-label-md text-on-background mb-2">Booking Wizard</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Frictionless appointment scheduling with smart triage.</p>
+</div>
+<!-- Card 2 -->
+<div class="bg-forest-tint p-padding-card rounded-2xl shadow-warm-md card-hover-lift relative group border border-surface-variant/20">
+<span class="material-symbols-outlined absolute top-6 right-6 text-on-surface-variant group-hover:text-on-background transition-colors">arrow_outward</span>
+<span class="material-symbols-outlined text-secondary text-4xl mb-6 bg-surface/50 p-3 rounded-full" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<h4 class="font-label-md text-label-md text-on-background mb-2">Biometrics Tracking</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Visualize health trends with elegant, easy-to-read charts.</p>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-highest/30 p-padding-card rounded-2xl shadow-warm-md card-hover-lift relative group sm:col-span-2 border border-surface-variant/40">
+<span class="material-symbols-outlined absolute top-6 right-6 text-on-surface-variant group-hover:text-on-background transition-colors">arrow_outward</span>
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-on-surface text-4xl bg-surface p-3 rounded-full" style="font-variation-settings: 'FILL' 1;">payments</span>
+<h4 class="font-label-md text-label-md text-on-background">Refills &amp; Billing</h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">One-tap prescription renewals and transparent Stripe-powered invoicing.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="max-w-4xl mx-auto px-4 md:px-margin-desktop py-gap-section mt-12 text-center fade-in-up delay-400" style="animation-play-state: running;">
+<div class="bg-surface-container-lowest p-12 md:p-16 rounded-[32px] shadow-warm-xl border border-surface-variant/50 relative overflow-hidden">
+<!-- Decorative background blob -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-fixed/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-3xl -ml-20 -mb-20"></div>
+<div class="relative z-10">
+<h2 class="font-headline-md text-headline-md text-on-background mb-6">Ready to elevate your practice?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-10 max-w-xl mx-auto">
+                        Join thousands of providers who have reclaimed their time and improved patient outcomes with VitalSync.
+                    </p>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md rounded-full px-10 py-4 shadow-warm-md transition-all hover:scale-105 inline-flex items-center gap-3">
+                        Get Started Free
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-6 opacity-70">No credit card required. 14-day full feature trial.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component (from JSON) -->
+<footer class="w-full bg-transparent border-t border-surface-variant/30 mt-auto">
+<div class="w-full px-4 md:px-margin-desktop max-w-7xl mx-auto py-gap-section flex flex-col md:flex-row justify-between gap-12">
+<div class="flex flex-col gap-4 max-w-xs">
+<div class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">vital_signs</span>
+                    VitalSync
+                </div>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80">
+                    © 2026 VitalSync. Humanist, trustworthy, and profoundly calm.
+                </p>
+</div>
+<div class="flex gap-16">
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md text-label-md text-on-background font-bold">Product</h4>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Features</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Pricing</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Integrations</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md text-label-md text-on-background font-bold">Company</h4>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">About Us</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Careers</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Contact</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-label-md text-label-md text-on-background font-bold">Legal</h4>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-all opacity-80 hover:opacity-100" href="#">HIPAA Compliance</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- Intersection Observer for scroll animations -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+        });
+    </script>
+
+
+</body></html>

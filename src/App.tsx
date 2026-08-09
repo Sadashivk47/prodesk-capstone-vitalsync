@@ -16,6 +16,7 @@ import {
 } from './lib/api';
 
 import { AuthCard } from './components/auth/AuthCard';
+import { LandingPage } from './components/landing/LandingPage';
 import { Sidebar } from './components/layout/Sidebar';
 import { Topbar } from './components/layout/Topbar';
 import { PatientMobileBottomNav } from './components/layout/PatientMobileBottomNav';
@@ -40,16 +41,17 @@ import { Calendar, Pill, ArrowRight, Loader2, CreditCard, Activity } from 'lucid
 // 'authenticated'  → user is logged in (show dashboard)
 // 'unauthenticated'→ explicitly logged out (show login screen)
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
+type UnauthView = 'landing' | 'login';
 
 function AppLoadingSpinner() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 via-slate-50 to-teal-50/50 gap-4">
-      <div className="w-14 h-14 bg-teal-800 rounded-2xl flex items-center justify-center shadow-md shadow-teal-900/10 animate-pulse">
-        <Activity className="w-8 h-8 text-teal-300" />
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#f8f3eb] gap-4">
+      <div className="w-14 h-14 bg-[#2849e5] rounded-2xl flex items-center justify-center shadow-warm-md animate-pulse">
+        <Activity className="w-8 h-8 text-white" />
       </div>
-      <div className="flex items-center gap-2 text-slate-500">
-        <Loader2 className="w-4 h-4 animate-spin text-teal-700" />
-        <span className="text-sm font-medium tracking-tight">Loading VitalSync…</span>
+      <div className="flex items-center gap-2 text-[#444655]">
+        <Loader2 className="w-4 h-4 animate-spin text-[#2849e5]" />
+        <span className="text-sm font-medium tracking-tight font-sans-dm">Loading VitalSync…</span>
       </div>
     </div>
   );
@@ -58,6 +60,7 @@ function AppLoadingSpinner() {
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authStatus, setAuthStatus] = useState<AuthStatus>('loading');
+  const [unauthView, setUnauthView] = useState<UnauthView>('landing');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedPatientId, setSelectedPatientId] = useState<string>('pat-emily-chen');
@@ -240,6 +243,7 @@ export default function App() {
   const handleLogout = () => {
     auth.clearToken();
     setCurrentUser(null);
+    setUnauthView('landing'); // return to landing page on logout
     setAuthStatus('unauthenticated'); // explicit state prevents re-flash on logout
   };
 
@@ -303,13 +307,17 @@ export default function App() {
     return <AppLoadingSpinner />;
   }
   if (authStatus === 'unauthenticated' || !currentUser) {
-    // Explicitly logged out — safe to show login
+    // Show landing page by default, switch to login when user requests it
+    if (unauthView === 'landing') {
+      return <LandingPage onNavigateToLogin={() => setUnauthView('login')} />;
+    }
     return (
       <AuthCard
         onLoginSuccess={(user) => {
           setCurrentUser(user);
           setAuthStatus('authenticated');
         }}
+        onBackToLanding={() => setUnauthView('landing')}
       />
     );
   }
@@ -326,7 +334,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans">
+    <div className="min-h-screen bg-[#f2ede5] text-[#1d1c17] flex font-sans-dm">
       {/* Sidebar Navigation */}
       <Sidebar
         user={currentUser}
@@ -346,8 +354,8 @@ export default function App() {
 
         {/* Global Loading Bar */}
         {isLoadingData && (
-          <div className="bg-teal-50 border-b border-teal-200 px-4 py-1.5 text-xs text-teal-800 font-medium flex items-center justify-center gap-2">
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-700" />
+          <div className="bg-[#dee0ff]/60 border-b border-[#a2baff]/40 px-4 py-1.5 text-xs text-[#001848] font-medium flex items-center justify-center gap-2">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#2849e5]" />
             <span>Synchronizing live clinical database...</span>
           </div>
         )}
