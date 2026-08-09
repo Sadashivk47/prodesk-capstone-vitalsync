@@ -1,5 +1,11 @@
 import App from '../App';
+import { ToastProvider } from '../components/ui/Toast';
 
 export default function Page() {
-  return <App />;
+  return (
+    <ToastProvider>
+      <App />
+    </ToastProvider>
+  );
 }
+

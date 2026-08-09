@@ -31,6 +31,7 @@ import { BookAppointmentModal } from './components/modals/BookAppointmentModal';
 import { AddSlotModal } from './components/modals/AddSlotModal';
 import { AiAssistModal } from './components/modals/AiAssistModal';
 import { PaymentSuccessModal } from './components/modals/PaymentSuccessModal';
+import { toast, ToastProvider } from './components/ui/Toast';
 
 import { Calendar, Pill, ArrowRight, Loader2, CreditCard, Activity } from 'lucide-react';
 
@@ -202,7 +203,7 @@ export default function App() {
       }
     } catch (err: any) {
       console.error('Checkout error:', err);
-      alert(`Payment initialization failed: ${err?.response?.data?.message || err?.message || 'Server error'}`);
+      toast.error(err?.response?.data?.message || err?.message || 'Payment initialization failed', 'Checkout Error');
     } finally {
       setIsPaymentLoading(false);
     }
@@ -225,7 +226,7 @@ export default function App() {
       }
     } catch (err: any) {
       console.error('Checkout error:', err);
-      alert(`Payment initialization failed: ${err?.response?.data?.message || err?.message || 'Server error'}`);
+      toast.error(err?.response?.data?.message || err?.message || 'Payment initialization failed', 'Checkout Error');
     } finally {
       setIsPaymentLoading(false);
     }
@@ -240,15 +241,6 @@ export default function App() {
     auth.clearToken();
     setCurrentUser(null);
     setAuthStatus('unauthenticated'); // explicit state prevents re-flash on logout
-  };
-
-  const handleSwitchRole = (role: Role) => {
-    if (!currentUser) return;
-    setCurrentUser({
-      ...currentUser,
-      role,
-    });
-    setActiveTab('dashboard');
   };
 
   const handleAddMedicalRecord = async (newRecordData: MedicalRecord) => {
@@ -341,7 +333,6 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
-        onSwitchRole={handleSwitchRole}
       />
 
       {/* Main Content Area */}

@@ -19,7 +19,6 @@ interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
-  onSwitchRole: (role: Role) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -27,7 +26,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   setActiveTab,
   onLogout,
-  onSwitchRole,
 }) => {
   const isDoctor = user.role === 'doctor';
 
@@ -66,18 +64,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Role Switcher Badge / Quick Demo Switch */}
-      <div className="mx-2 mb-6 p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs">
-        <span className="font-medium text-slate-600">
-          Role: <strong className="text-teal-800 uppercase">{user.role}</strong>
+      {/* Role Badge */}
+      <div className="mx-2 mb-6 p-2.5 bg-slate-50 border border-slate-200/80 rounded-lg flex items-center justify-between text-xs">
+        <span className="font-medium text-slate-600 flex items-center gap-1.5">
+          <span>Account Role:</span>
+          <strong className="text-teal-800 uppercase px-2 py-0.5 bg-teal-50 border border-teal-200 rounded text-[11px] font-bold">
+            {user.role}
+          </strong>
         </span>
-        <button
-          onClick={() => onSwitchRole(isDoctor ? 'patient' : 'doctor')}
-          className="text-[11px] font-bold text-teal-800 hover:bg-teal-100/60 px-2 py-1 rounded transition-colors"
-          title="Switch view to test other role"
-        >
-          Switch to {isDoctor ? 'Patient' : 'Doctor'}
-        </button>
       </div>
 
       {/* Navigation Tabs */}

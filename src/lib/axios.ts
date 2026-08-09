@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from '../components/ui/Toast';
 
 const TOKEN_KEY = 'vitalsync_jwt_token';
 
@@ -36,4 +37,51 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Response interceptor to catch errors and display user-friendly Toast messages
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (typeof window !== 'undefined') {
+      const responseData = error.response?.data;
+      const statusCode = error.response?.status;
+
+      let title = 'Request Failed';
+      let userMessage: string | string[] = 'An unexpected error occurred. Please try again.';
+
+      if (statusCode === 400) {
+        title = 'Bad Request / Validation Error';
+      } else if (statusCode === 401) {
+        title = 'Authentication Error';
+      } else if (statusCode === 403) {
+        title = 'Access Denied';
+      } else if (statusCode === 404) {
+        title = 'Not Found';
+      } else if (statusCode === 409) {
+        title = 'Resource Conflict';
+      } else if (statusCode === 429) {
+        title = 'Rate Limit Exceeded';
+        userMessage = 'Too many requests. Please wait a moment before trying again.';
+      } else if (statusCode >= 500) {
+        title = 'Server Error';
+        userMessage = 'An unexpected server error occurred. Please try again later.';
+      }
+
+      if (responseData && responseData.message) {
+        if (Array.isArray(responseData.message)) {
+          userMessage = responseData.message;
+        } else if (typeof responseData.message === 'string' && statusCode !== 500) {
+          userMessage = responseData.message;
+        }
+      } else if (error.message === 'Network Error' || !error.response) {
+        title = 'Connection Error';
+        userMessage = 'Unable to connect to VitalSync server. Please check backend connection.';
+      }
+
+      toast.error(userMessage, title);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default apiClient;
+
